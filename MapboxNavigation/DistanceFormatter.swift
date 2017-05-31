@@ -35,9 +35,15 @@ public class DistanceFormatter: LengthFormatter {
     public func string(from distance: CLLocationDistance) -> String {
         let miles = distance / metersPerMile
         let feet = miles * feetPerMile
-        
+
         var unit: LengthFormatter.Unit = .millimeter
-        unitString(fromMeters: distance, usedUnit: &unit)
+
+        if Locale.current.regionCode == "GB" {
+            unit = .mile
+        }
+        else {
+            unitString(fromMeters: distance, usedUnit: &unit)
+        }
         let replacesYardsWithMiles = unit == .yard && miles > 0.2
         let showsMixedFraction = (unit == .mile && miles < 10) || replacesYardsWithMiles
         
@@ -75,7 +81,13 @@ public class DistanceFormatter: LengthFormatter {
                 formattedDistance = string(fromValue: feet, unit: unit)
             }
         } else {
-            formattedDistance = string(fromMeters: distance)
+
+            if Locale.current.regionCode == "GB" {
+                formattedDistance = string(fromValue: miles, unit: unit)
+            }
+            else {
+                formattedDistance = string(fromMeters: distance)
+            }
         }
         
         // Elaborate hack continued.
